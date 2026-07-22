@@ -1,9 +1,6 @@
-# IMDb-Interests repo files (staging)
+# IMDb-Interests repo
 
-These files are **not part of Kometa's runtime**. They are staged here for convenience and are meant to
-be copied into the **`Kometa-Team/IMDb-Interests`** repository.
-
-## What they do
+## What's all this then
 
 Kometa's `imdb_search` `interests:` filter needs a `name -> in-id` map to translate friendly interest
 names into the `in########` IDs IMDb's GraphQL `advancedTitleSearch` expects. That catalog changes over
