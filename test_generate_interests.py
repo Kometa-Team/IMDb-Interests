@@ -23,21 +23,22 @@ class GenerateInterestsTests(unittest.TestCase):
         self.assertEqual(headers["accept-language"], "en")
         self.assertEqual(headers["x-imdb-user-country"], "US")
 
+    @patch("generate_interests.build_headers", return_value={"x-test-header": "value"})
     @patch("generate_interests.requests.post")
-    def test_fetch_interests_uses_built_headers(self, post_mock):
+    def test_fetch_interests_uses_built_headers(self, post_mock, build_headers_mock):
         response = MagicMock()
         response.json.return_value = {
             "data": {"interestCategories": {"edges": [{"node": {"interests": {"edges": []}}}]}}
         }
         post_mock.return_value = response
-        expected_headers = generate_interests.build_headers()
 
         result = generate_interests.fetch_interests(retries=1)
 
         self.assertEqual(result, [{"node": {"interests": {"edges": []}}}])
+        build_headers_mock.assert_called_once_with()
         post_mock.assert_called_once_with(
             generate_interests.GRAPHQL_URL,
-            headers=expected_headers,
+            headers={"x-test-header": "value"},
             json={"query": generate_interests.QUERY},
             timeout=60,
         )
