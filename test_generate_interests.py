@@ -17,6 +17,12 @@ class GenerateInterestsTests(unittest.TestCase):
         self.assertEqual(headers["x-imdb-user-country"], "US")
         self.assertIn("Mozilla/5.0", headers["user-agent"])
 
+    def test_build_headers_defaults_country_when_locale_has_no_region(self):
+        headers = generate_interests.build_headers("en")
+
+        self.assertEqual(headers["accept-language"], "en")
+        self.assertEqual(headers["x-imdb-user-country"], "US")
+
     @patch("generate_interests.requests.post")
     def test_fetch_interests_uses_built_headers(self, post_mock):
         response = MagicMock()
