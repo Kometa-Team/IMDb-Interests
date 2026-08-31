@@ -27,6 +27,7 @@ class GenerateInterestsTests(unittest.TestCase):
     @patch("generate_interests.requests.post")
     def test_fetch_interests_uses_built_headers(self, post_mock, build_headers_mock):
         response = MagicMock()
+        response.raise_for_status.return_value = None
         response.json.return_value = {
             "data": {"interestCategories": {"edges": [{"node": {"interests": {"edges": []}}}]}}
         }
