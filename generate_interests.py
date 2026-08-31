@@ -22,7 +22,18 @@ import time
 import requests
 
 GRAPHQL_URL = "https://api.graphql.imdb.com/"
-HEADERS = {"content-type": "application/json"}
+DEFAULT_LOCALE = "en-US"
+HEADERS = {
+    "accept": "application/json",
+    "content-type": "application/json",
+    "origin": "https://www.imdb.com",
+    "referer": "https://www.imdb.com/",
+    "user-agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+    ),
+    "x-imdb-client-name": "imdb-web-next-localized",
+}
 # One request pulls every category with all of its interests; these caps are generous ceilings.
 QUERY = (
     "{ interestCategories(first: 200) { edges { node { "
@@ -36,11 +47,17 @@ def normalize(text):
     return text.lower().replace(" ", "_").replace("-", "_")
 
 
+def build_headers(locale=DEFAULT_LOCALE):
+    locale = locale.replace("_", "-")
+    country = locale.split("-", 1)[1] if "-" in locale else "US"
+    return {**HEADERS, "accept-language": locale, "x-imdb-user-country": country}
+
+
 def fetch_interests(retries=3):
     last_error = None
     for attempt in range(1, retries + 1):
         try:
-            response = requests.post(GRAPHQL_URL, headers=HEADERS, json={"query": QUERY}, timeout=60)
+            response = requests.post(GRAPHQL_URL, headers=build_headers(), json={"query": QUERY}, timeout=60)
             response.raise_for_status()
             payload = response.json()
             if "errors" in payload:
