@@ -58,6 +58,16 @@ def fetch_interests(retries=3):
     for attempt in range(1, retries + 1):
         try:
             response = requests.post(GRAPHQL_URL, headers=build_headers(), json={"query": QUERY}, timeout=60)
+            if not response.ok:
+                print(
+                    f"Attempt {attempt}/{retries}: HTTP {response.status_code} {response.reason}\n"
+                    f"  server: {response.headers.get('server')}\n"
+                    f"  via: {response.headers.get('via')}\n"
+                    f"  x-cache: {response.headers.get('x-cache')}\n"
+                    f"  content-type: {response.headers.get('content-type')}\n"
+                    f"  body: {response.text[:500]!r}",
+                    file=sys.stderr,
+                )
             response.raise_for_status()
             payload = response.json()
             if "errors" in payload:
