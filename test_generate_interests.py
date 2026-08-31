@@ -24,13 +24,14 @@ class GenerateInterestsTests(unittest.TestCase):
             "data": {"interestCategories": {"edges": [{"node": {"interests": {"edges": []}}}]}}
         }
         post_mock.return_value = response
+        expected_headers = generate_interests.build_headers()
 
         result = generate_interests.fetch_interests(retries=1)
 
         self.assertEqual(result, [{"node": {"interests": {"edges": []}}}])
         post_mock.assert_called_once_with(
             generate_interests.GRAPHQL_URL,
-            headers=generate_interests.build_headers(),
+            headers=expected_headers,
             json={"query": generate_interests.QUERY},
             timeout=60,
         )
